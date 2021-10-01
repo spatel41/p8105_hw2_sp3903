@@ -1,21 +1,17 @@
 ---
-title: "Simple document"
+title: "Homework 2"
 output: html_document
 ---
 
-I'm an R Markdown document! 
+# Problem 1
 
-# Section 1
-
-Here's a **code chunk** that samples from 
-a _normal distribution_:
-
+Instructions
+* specify the sheet in the Excel file and to omit non-data entries (rows with notes / figures; columns containing notes) using arguments in read_excel
 ```{r}
-samp = rnorm(100)
-length(samp)
+library(tidyverse)
+library(readxl)
+trash_wheel = read_excel("data/trash_wheel.xlsx", range = "A2:N406")
 ```
 
-# Section 2
-
-I can take the mean of the sample, too!
-The mean is `r mean(samp)`.
+Instructions
+* use reasonable variable names
