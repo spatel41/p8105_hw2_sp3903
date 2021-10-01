@@ -355,6 +355,8 @@ pre code {
 <div id="problem-1" class="section level1">
 <h1>Problem 1</h1>
 <p>Instructions * specify the sheet in the Excel file and to omit non-data entries (rows with notes / figures; columns containing notes) using arguments in read_excel</p>
+<div id="reading-in-data" class="section level2">
+<h2>Reading in data</h2>
 <pre class="r"><code>library(tidyverse)</code></pre>
 <pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
 <pre><code>## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
@@ -367,28 +369,29 @@ pre code {
 <pre class="r"><code>library(readxl)
 trash_wheel = read_excel(&quot;data/trash_wheel.xlsx&quot;, range = &quot;A2:N406&quot;)</code></pre>
 <p>Instructions * use reasonable variable names</p>
+</div>
+<div id="cleaning-names" class="section level2">
+<h2>Cleaning names</h2>
 <pre class="r"><code>trash_wheel = janitor::clean_names(trash_wheel)
 view(trash_wheel)</code></pre>
 <p>Instructions * omit rows that do not include dumpster-specific data</p>
-<pre class="r"><code>drop_na(trash_wheel)</code></pre>
-<pre><code>## # A tibble: 344 × 14
-##    dumpster month  year date                weight_tons volume_cubic_yards
-##       &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dttm&gt;                    &lt;dbl&gt;              &lt;dbl&gt;
-##  1        1 May    2014 2014-05-16 00:00:00        4.31                 18
-##  2        2 May    2014 2014-05-16 00:00:00        2.74                 13
-##  3        3 May    2014 2014-05-16 00:00:00        3.45                 15
-##  4        4 May    2014 2014-05-17 00:00:00        3.1                  15
-##  5        5 May    2014 2014-05-17 00:00:00        4.06                 18
-##  6        6 May    2014 2014-05-20 00:00:00        2.71                 13
-##  7        7 May    2014 2014-05-21 00:00:00        1.91                  8
-##  8        8 May    2014 2014-05-28 00:00:00        3.7                  16
-##  9        9 June   2014 2014-06-05 00:00:00        2.52                 14
-## 10       10 June   2014 2014-06-11 00:00:00        3.76                 18
-## # … with 334 more rows, and 8 more variables: plastic_bottles &lt;dbl&gt;,
-## #   polystyrene &lt;dbl&gt;, cigarette_butts &lt;dbl&gt;, glass_bottles &lt;dbl&gt;,
-## #   grocery_bags &lt;dbl&gt;, chip_bags &lt;dbl&gt;, sports_balls &lt;dbl&gt;,
-## #   homes_powered &lt;dbl&gt;</code></pre>
-<pre class="r"><code>view(trash_wheel)</code></pre>
+</div>
+<div id="dropping-nas-from-dataset" class="section level2">
+<h2>Dropping Na’s from dataset</h2>
+<pre class="r"><code>trash_wheel = drop_na(trash_wheel)
+view(trash_wheel)</code></pre>
+<p>Instructions * round the number of sports balls to the nearest integer</p>
+</div>
+<div id="changing-sports_ball-to-0-digits" class="section level2">
+<h2>Changing sports_ball to 0 digits</h2>
+<pre class="r"><code>trash_wheel = round(trash_wheel$sports_balls, digits = 0)</code></pre>
+<p>***is not making the change in the dataset</p>
+<p>Instructions * Read and clean precipitation data for 2018 and 2019. For each, omit rows without precipitation data and add a variable for year. Next, combine precipitation datasets and convert month to a character variable (the variable month.name is built into R and should be useful). * Write a paragraph about these data; you are encouraged to use inline R. Be sure to note the number of observations in both resulting datasets, and give examples of key variables. For available data, what was the total precipitation in 2018? What was the median number of sports balls in a dumpster in 2017?</p>
+</div>
+</div>
+<div id="problem-2" class="section level1">
+<h1>Problem 2</h1>
+<p>Instructions * First, clean the data in pols-month.csv. Use separate() to break up the variable mon into integer variables year, month, and day; replace month number with month name; create a president variable taking values gop and dem, and remove prez_dem and prez_gop; and remove the day variable.</p>
 </div>
 
 

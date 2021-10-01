@@ -3,38 +3,52 @@ title: "Homework 2"
 output: html_document
 ---
 
+```{r}
+library(tidyverse)
+library(readxl)
+```
+
 # Problem 1
 
 Instructions
 * specify the sheet in the Excel file and to omit non-data entries (rows with notes / figures; columns containing notes) using arguments in read_excel
-```{r}
-library(tidyverse)
-library(readxl)
-trash_wheel = read_excel("data/trash_wheel.xlsx", range = "A2:N406")
-```
-
-Instructions
 * use reasonable variable names
-```{r}
-trash_wheel = janitor::clean_names(trash_wheel)
-view(trash_wheel)
-```
-
-Instructions
 * omit rows that do not include dumpster-specific data
+* round the number of sports balls to the nearest integer
+* is not making the change in the dataset
+
+## Cleaning Data
 ```{r}
-drop_na(trash_wheel)
-view(trash_wheel)
+trash_wheel = read_excel("data/trash_wheel.xlsx", range = "A2:N406") %>% 
+  janitor::clean_names() %>% 
+  drop_na(dumpster) %>% 
+  mutate(sports_balls = round(sports_balls, digits = 0))
 ```
 
-Instructions
-* round the number of sports balls to the nearest integer
 ```{r}
-round(trash_wheel$sports_balls, digits = 0)
+rain_2019 = read_excel("data/trash_wheel.xlsx", 
+  sheet = "2019 Precipitation", skip = 1)  %>%
+  janitor::clean_names() %>% 
+  drop_na(month, total) 
 ```
-***is not making the change in the dataset
 
 Instructions
 * Read and clean precipitation data for 2018 and 2019. For each, omit rows without precipitation data and add a variable for year. Next, combine precipitation datasets and convert month to a character variable (the variable month.name is built into R and should be useful).
 * Write a paragraph about these data; you are encouraged to use inline R. Be sure to note the number of observations in both resulting datasets, and give examples of key variables. For available data, what was the total precipitation in 2018? What was the median number of sports balls in a dumpster in 2017?
+
+# Problem 2
+
+Instructions
+* First, clean the data in pols-month.csv. Use separate() to break up the variable mon into integer variables year, month, and day; replace month number with month name; create a president variable taking values gop and dem, and remove prez_dem and prez_gop; and remove the day variable.
+
+```{r}
+pols_months = 
+  read_csv("data/pols-month.csv") %>% 
+  janitor::clean_names() %>% 
+  separate(mon, into = c("year", "month", "day"), sep = "-")
+view(pols_months)
+```
+
+
+
 
