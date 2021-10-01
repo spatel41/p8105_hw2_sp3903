@@ -367,6 +367,28 @@ pre code {
 <pre class="r"><code>library(readxl)
 trash_wheel = read_excel(&quot;data/trash_wheel.xlsx&quot;, range = &quot;A2:N406&quot;)</code></pre>
 <p>Instructions * use reasonable variable names</p>
+<pre class="r"><code>trash_wheel = janitor::clean_names(trash_wheel)
+view(trash_wheel)</code></pre>
+<p>Instructions * omit rows that do not include dumpster-specific data</p>
+<pre class="r"><code>drop_na(trash_wheel)</code></pre>
+<pre><code>## # A tibble: 344 × 14
+##    dumpster month  year date                weight_tons volume_cubic_yards
+##       &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dttm&gt;                    &lt;dbl&gt;              &lt;dbl&gt;
+##  1        1 May    2014 2014-05-16 00:00:00        4.31                 18
+##  2        2 May    2014 2014-05-16 00:00:00        2.74                 13
+##  3        3 May    2014 2014-05-16 00:00:00        3.45                 15
+##  4        4 May    2014 2014-05-17 00:00:00        3.1                  15
+##  5        5 May    2014 2014-05-17 00:00:00        4.06                 18
+##  6        6 May    2014 2014-05-20 00:00:00        2.71                 13
+##  7        7 May    2014 2014-05-21 00:00:00        1.91                  8
+##  8        8 May    2014 2014-05-28 00:00:00        3.7                  16
+##  9        9 June   2014 2014-06-05 00:00:00        2.52                 14
+## 10       10 June   2014 2014-06-11 00:00:00        3.76                 18
+## # … with 334 more rows, and 8 more variables: plastic_bottles &lt;dbl&gt;,
+## #   polystyrene &lt;dbl&gt;, cigarette_butts &lt;dbl&gt;, glass_bottles &lt;dbl&gt;,
+## #   grocery_bags &lt;dbl&gt;, chip_bags &lt;dbl&gt;, sports_balls &lt;dbl&gt;,
+## #   homes_powered &lt;dbl&gt;</code></pre>
+<pre class="r"><code>view(trash_wheel)</code></pre>
 </div>
 
 

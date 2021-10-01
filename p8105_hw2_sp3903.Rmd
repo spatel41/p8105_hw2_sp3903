@@ -15,3 +15,26 @@ trash_wheel = read_excel("data/trash_wheel.xlsx", range = "A2:N406")
 
 Instructions
 * use reasonable variable names
+```{r}
+trash_wheel = janitor::clean_names(trash_wheel)
+view(trash_wheel)
+```
+
+Instructions
+* omit rows that do not include dumpster-specific data
+```{r}
+drop_na(trash_wheel)
+view(trash_wheel)
+```
+
+Instructions
+* round the number of sports balls to the nearest integer
+```{r}
+round(trash_wheel$sports_balls, digits = 0)
+```
+***is not making the change in the dataset
+
+Instructions
+* Read and clean precipitation data for 2018 and 2019. For each, omit rows without precipitation data and add a variable for year. Next, combine precipitation datasets and convert month to a character variable (the variable month.name is built into R and should be useful).
+* Write a paragraph about these data; you are encouraged to use inline R. Be sure to note the number of observations in both resulting datasets, and give examples of key variables. For available data, what was the total precipitation in 2018? What was the median number of sports balls in a dumpster in 2017?
+
