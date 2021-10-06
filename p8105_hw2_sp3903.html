@@ -363,18 +363,15 @@ pre code {
 ## x dplyr::lag()    masks stats::lag()</code></pre>
 <pre class="r"><code>library(readxl)
 library(dplyr)
-library()</code></pre>
+library(stringr) </code></pre>
 <div id="problem-1" class="section level1">
 <h1>Problem 1</h1>
-<p>Instructions * specify the sheet in the Excel file and to omit non-data entries (rows with notes / figures; columns containing notes) using<br />
-arguments in read_excel * use reasonable variable names * omit rows that do not include dumpster-specific data * round the number of sports balls to the nearest integer</p>
 <div id="cleaning-trash_wheel-data" class="section level2">
 <h2>Cleaning trash_wheel Data</h2>
 <pre class="r"><code>trash_wheel = read_excel(&quot;data/trash_wheel.xlsx&quot;, range = &quot;A2:N406&quot;) %&gt;% 
   janitor::clean_names() %&gt;% 
   drop_na(dumpster) %&gt;% 
   mutate(sports_balls = round(sports_balls, digits = 0))</code></pre>
-<p>Instructions * Read and clean precipitation data for 2018 and 2019. For each, omit rows without precipitation data and add a variable for year. Next, combine precipitation datasets and convert month to a character variable (the variable month.name is built into R and should be useful).</p>
 </div>
 <div id="cleaning-precipitation-data-2019" class="section level2">
 <h2>Cleaning precipitation data 2019</h2>
@@ -405,9 +402,8 @@ arguments in read_excel * use reasonable variable names * omit rows that do not 
               &quot;Apr&quot;,&quot;May&quot;,&quot;Jun&quot;,
               &quot;Jul&quot;,&quot;Aug&quot;,&quot;Sep&quot;,
               &quot;Oct&quot;,&quot;Nov&quot;,&quot;Dec&quot;)
-#add abbreviated month name
+
 combined_rain$month &lt;- mymonths[ combined_rain$month ]</code></pre>
-<p>Instructions * Write a paragraph about these data; you are encouraged to use inline R. Be sure to note the number of observations in both resulting datasets, and give examples of key variables. For available data, what was the total precipitation in 2018? What was the median number of sports balls in a dumpster in 2017?</p>
 </div>
 </div>
 <div id="description-of-datasets" class="section level1">
@@ -435,11 +431,17 @@ combined_rain$month &lt;- mymonths[ combined_rain$month ]</code></pre>
 </div>
 <div id="problem-2" class="section level1">
 <h1>Problem 2</h1>
-<p>Instructions * First, clean the data in pols-month.csv. Use separate() to break up the variable mon into integer variables year, month, and day; replace month number with month name; create a president variable taking values gop and dem, and remove prez_dem and prez_gop; and remove the day variable.</p>
+<div id="pols_months-data-cleaning" class="section level2">
+<h2>Pols_months data cleaning</h2>
 <pre class="r"><code>pols_months = 
   read_csv(&quot;data/pols-month.csv&quot;) %&gt;% 
   janitor::clean_names() %&gt;% 
-  separate(mon, into = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;) </code></pre>
+  separate(mon, into = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;), sep = &quot;-&quot;) %&gt;%
+  mutate(
+    prez_dem = recode(prez_dem, `1` = &quot;dem&quot;, `0` = &quot;gop&quot;),
+    prez_dem = factor(prez_dem)) %&gt;% 
+  rename(president = prez_dem) %&gt;% 
+  select(-prez_gop, -day) </code></pre>
 <pre><code>## Rows: 822 Columns: 9</code></pre>
 <pre><code>## ── Column specification ────────────────────────────────────────────────────────
 ## Delimiter: &quot;,&quot;
@@ -448,13 +450,26 @@ combined_rain$month &lt;- mymonths[ combined_rain$month ]</code></pre>
 <pre><code>## 
 ## ℹ Use `spec()` to retrieve the full column specification for this data.
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<p>error: prez_gop not found? error: replace month number with month name</p>
-<p>Instructions * Second, clean the data in snp.csv using a similar process to the above. For consistency across datasets, arrange according to year and month, and organize so that year and month are the leading columns.</p>
+<pre class="r"><code>pols_months$month &lt;- str_remove(pols_months$month, &quot;^0+&quot;)
+pols_months$month &lt;- as.numeric(pols_months$month)
+pols_months$year = as.numeric(pols_months$year)</code></pre>
+<pre class="r"><code>mymonths &lt;- c(&quot;Jan&quot;,&quot;Feb&quot;,&quot;Mar&quot;,
+              &quot;Apr&quot;,&quot;May&quot;,&quot;Jun&quot;,
+              &quot;Jul&quot;,&quot;Aug&quot;,&quot;Sep&quot;,
+              &quot;Oct&quot;,&quot;Nov&quot;,&quot;Dec&quot;)
+
+pols_months$month &lt;- mymonths[ pols_months$month ]</code></pre>
+<pre class="r"><code>pols_months = pols_months %&gt;% 
+  mutate(
+    month = str_to_lower(month)) </code></pre>
+</div>
+<div id="snp-data-cleaning" class="section level2">
+<h2>Snp Data Cleaning</h2>
 <pre class="r"><code>snp = 
   read_csv(&quot;data/snp.csv&quot;) %&gt;% 
   janitor::clean_names() %&gt;% 
   separate(date, into = c(&quot;month&quot;, &quot;day&quot;, &quot;year&quot;), sep = &quot;/&quot;) %&gt;% 
-  relocate(year, month, everything())</code></pre>
+  relocate(year, month, everything()) </code></pre>
 <pre><code>## Rows: 787 Columns: 2</code></pre>
 <pre><code>## ── Column specification ────────────────────────────────────────────────────────
 ## Delimiter: &quot;,&quot;
@@ -463,8 +478,16 @@ combined_rain$month &lt;- mymonths[ combined_rain$month ]</code></pre>
 <pre><code>## 
 ## ℹ Use `spec()` to retrieve the full column specification for this data.
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<p>error: how to make the year form 2 digits to 4</p>
-<p>Instructions * Third, tidy the unemployment data so that it can be merged with the previous datasets. This process will involve switching from “wide” to “long” format; ensuring that key variables have the same name; and ensuring that key variables take the same values.</p>
+<pre class="r"><code>snp$month &lt;- as.numeric(snp$month)
+snp$year = as.numeric(snp$year)
+snp$month &lt;- mymonths[ snp$month ]</code></pre>
+<pre class="r"><code> snp = snp %&gt;% 
+  mutate( 
+   year = ifelse(year &gt; 21, year+1900, year+2000),
+   month = str_to_lower(month)) </code></pre>
+</div>
+<div id="unemployment-data-cleaning" class="section level2">
+<h2>Unemployment data cleaning</h2>
 <pre class="r"><code>unemployment = 
   read_csv(&quot;data/unemployment.csv&quot;) %&gt;% 
   janitor::clean_names() %&gt;% 
@@ -480,6 +503,45 @@ combined_rain$month &lt;- mymonths[ combined_rain$month ]</code></pre>
 <pre><code>## 
 ## ℹ Use `spec()` to retrieve the full column specification for this data.
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<p>Instructions * Join the datasets by merging snp into pols, and merging unemployment into the result.</p>
+</div>
+<div id="join-datasets" class="section level2">
+<h2>Join datasets</h2>
+<pre class="r"><code>snp_pols_combined = 
+ full_join(pols_months, snp, by = c(&quot;year&quot;, &quot;month&quot;))
+final_combined = 
+ full_join(snp_pols_combined, unemployment, by = c(&quot;year&quot;, &quot;month&quot;))</code></pre>
+</div>
+<div id="description-of-datasets-1" class="section level2">
+<h2>Description of datasets</h2>
+<div id="pols-dataset-description" class="section level3">
+<h3>Pols Dataset Description</h3>
+<ul>
+<li>The Pols dataset includes 9 variables: year, month, gov_gop, sen_gop, rep_gop, president, gov_dem, sen_dem, rep_dem.</li>
+<li>The number of observations in the Pols dataset is 822.</li>
+<li>The dataset has 822 rows and 9 columns.</li>
+<li>The range of the years is (1947, 2015).</li>
+</ul>
+</div>
+<div id="snp-dataset-description" class="section level3">
+<h3>Snp Dataset Description</h3>
+<ul>
+<li>The Pols dataset includes 4 variables: year, month, day, close.</li>
+<li>The number of observations in the Snp dataset is 787.</li>
+<li>The dataset has 787 rows and 4 columns.</li>
+<li>The range of the years is (1950, 2015).</li>
+</ul>
+</div>
+<div id="unemployment-dataset-description" class="section level3">
+<h3>Unemployment Dataset Description</h3>
+<ul>
+<li>The Pols dataset includes 3 variables: year, month, close.</li>
+<li>The number of observations in the Unemployment dataset is 816.</li>
+<li>The dataset has 816 rows and 3 columns.</li>
+<li>The range of the years is (1948, 2015).</li>
+</ul>
+</div>
+</div>
 </div>
 <div id="problem-3" class="section level1">
 <h1>Problem 3</h1>
@@ -499,9 +561,52 @@ combined_rain$month &lt;- mymonths[ combined_rain$month ]</code></pre>
 <pre><code>## 
 ## ℹ Use `spec()` to retrieve the full column specification for this data.
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<p>eror: not sure what it means by: “the names of a categorical predictor and the case structure of string variables changed over time”</p>
 <p>Instructions: * Produce a well-structured, reader-friendly table showing the rank in popularity of the name “Olivia” as a female baby name over time; this should have rows for ethnicities and columns for year. Produce a similar table showing the most popular name among male children over time.</p>
-<p>filter(baby_names, childs_first_name == olivia) knitr::kable()</p>
+<pre class="r"><code>olivia_popularity = 
+ filter(baby_names, childs_first_name == &quot;olivia&quot;) %&gt;% 
+ select(-gender, -count, -childs_first_name)  </code></pre>
+<pre class="r"><code>knitr::kable(head(olivia_popularity[, 1:3]), &quot;simple&quot;)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">year_of_birth</th>
+<th align="left">ethnicity</th>
+<th align="right">rank</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">2016</td>
+<td align="left">asian and pacific islander</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="right">2016</td>
+<td align="left">black non hispanic</td>
+<td align="right">8</td>
+</tr>
+<tr class="odd">
+<td align="right">2016</td>
+<td align="left">hispanic</td>
+<td align="right">13</td>
+</tr>
+<tr class="even">
+<td align="right">2016</td>
+<td align="left">white non hispanic</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="right">2015</td>
+<td align="left">asian and pacific islander</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="right">2015</td>
+<td align="left">black non hispanic</td>
+<td align="right">4</td>
+</tr>
+</tbody>
+</table>
 <p>Instructions: * Finally, for male, white non-hispanic children born in 2016, produce a scatter plot showing the number of children with a name (y axis) against the rank in popularity of that name (x axis).</p>
 </div>
 
