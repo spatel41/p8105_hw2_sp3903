@@ -188,8 +188,7 @@ final_combined =
 
 # Problem 3
 
-Instructions
-* Load and tidy the data. Note that, although these data may seem fairly well formatted initially, the names of a categorical predictor and the case structure of string variables changed over time; you’ll need to address this in your data cleaning. Also, some rows seem duplicated, and these will need to be removed (hint: google something like “dplyr remove duplicate rows” to get started).
+# Baby Names Cleaning 
 
 ```{r}
 baby_names = 
@@ -201,9 +200,7 @@ baby_names =
   distinct() 
 ```
 
-  
-Instructions:
-* Produce a well-structured, reader-friendly table showing the rank in popularity of the name “Olivia” as a female baby name over time; this should have rows for ethnicities and columns for year. Produce a similar table showing the most popular name among male children over time.
+# Olivia Table 
 
 ```{r}
 olivia_popularity = 
@@ -215,9 +212,31 @@ olivia_popularity =
 knitr::kable(head(olivia_popularity[, 1:3]), "simple")
 ```
 
+## Kyle Table 
+
+```{r}
+kyle_popularity = 
+ filter(baby_names, childs_first_name == "kyle") %>% 
+ select(-gender, -count, -childs_first_name)  
+```
+
+```{r}
+knitr::kable(head(kyle_popularity[, 1:3]), "simple")
+```
 
 Instructions:
 * Finally, for male, white non-hispanic children born in 2016, produce a scatter plot showing the number of children with a name (y axis) against the rank in popularity of that name (x axis).
 
+# Scatterplot
+
+```{r}
+scatterplot_data =   
+  filter(baby_names, gender == "male", ethnicity == "white non hispanic", year_of_birth == 2016)
+```
+
+```{r}
+ggplot(scatterplot_data, aes(x = rank, y = count)) + 
+    geom_point(aes, alpha = .5)
+```
 
 
