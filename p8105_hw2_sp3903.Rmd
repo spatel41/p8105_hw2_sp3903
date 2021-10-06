@@ -6,18 +6,21 @@ output: html_document
 ```{r}
 library(tidyverse)
 library(readxl)
+library(dplyr)
+library(stringr) 
 ```
 
 # Problem 1
 
 Instructions
-* specify the sheet in the Excel file and to omit non-data entries (rows with notes / figures; columns containing notes) using arguments in read_excel
+* specify the sheet in the Excel file and to omit non-data entries (rows with notes / figures; columns containing notes) using   
+  arguments in read_excel
 * use reasonable variable names
 * omit rows that do not include dumpster-specific data
 * round the number of sports balls to the nearest integer
-* is not making the change in the dataset
 
-## Cleaning Data
+## Cleaning trash_wheel Data
+
 ```{r}
 trash_wheel = read_excel("data/trash_wheel.xlsx", range = "A2:N406") %>% 
   janitor::clean_names() %>% 
@@ -25,30 +28,182 @@ trash_wheel = read_excel("data/trash_wheel.xlsx", range = "A2:N406") %>%
   mutate(sports_balls = round(sports_balls, digits = 0))
 ```
 
+Instructions
+* Read and clean precipitation data for 2018 and 2019. For each, omit rows without precipitation data and add a variable for year. Next, combine precipitation datasets and convert month to a character variable (the variable month.name is built into R and should be useful).
+
+## Cleaning precipitation data 2019 
+
 ```{r}
 rain_2019 = read_excel("data/trash_wheel.xlsx", 
   sheet = "2019 Precipitation", skip = 1)  %>%
   janitor::clean_names() %>% 
-  drop_na(month, total) 
+  drop_na(month, total) %>% 
+  mutate(
+    year = "2019")
+```
+
+## Cleaning precipitation data 2018
+
+```{r}
+rain_2018 = read_excel("data/trash_wheel.xlsx", 
+  sheet = "2018 Precipitation", skip = 1)  %>%
+  janitor::clean_names() %>% 
+  drop_na(month)  %>% 
+  mutate(
+    year = "2018")
+```
+
+## Combining the precipitation data 2019 and 2019 
+```{r}
+combined_rain = 
+  bind_rows(rain_2018, rain_2019) 
+```
+
+## Changing month number to name
+
+```{r}
+mymonths <- c("Jan","Feb","Mar",
+              "Apr","May","Jun",
+              "Jul","Aug","Sep",
+              "Oct","Nov","Dec")
+
+combined_rain$month <- mymonths[ combined_rain$month ]
 ```
 
 Instructions
-* Read and clean precipitation data for 2018 and 2019. For each, omit rows without precipitation data and add a variable for year. Next, combine precipitation datasets and convert month to a character variable (the variable month.name is built into R and should be useful).
 * Write a paragraph about these data; you are encouraged to use inline R. Be sure to note the number of observations in both resulting datasets, and give examples of key variables. For available data, what was the total precipitation in 2018? What was the median number of sports balls in a dumpster in 2017?
+
+# Description of datasets
+
+## Trash Wheel Dataset
+
+* The Trash Wheel dataset includes `r length(trash_wheel)` variables: `r variable.names(trash_wheel)`.
+* The number of observations in the Trash Wheel dataset is `r count(trash_wheel)`.
+* The dataset has `r nrow(trash_wheel)` rows and `r ncol(trash_wheel)` columns.
+* The range of the sports balls is (`r range(trash_wheel$sports_balls)`) mm.
+* The median number of sports balls is (`r median(trash_wheel$sports_balls, year = 2017)`).
+
+## Precipitation Dataset
+
+* The combined precipitation dataset includes `r length(combined_rain)` variables: `r variable.names(combined_rain)`.
+* The number of observations in the combined precipitation  dataset is `r count(combined_rain)`.
+* The dataset has `r nrow(combined_rain)` rows and `r ncol(combined_rain)` columns.
+* The range of precipitation is (`r range(combined_rain$total)`).
+* The total precipitation in 2018 was `r sum(rain_2018$total)`.
 
 # Problem 2
 
 Instructions
-* First, clean the data in pols-month.csv. Use separate() to break up the variable mon into integer variables year, month, and day; replace month number with month name; create a president variable taking values gop and dem, and remove prez_dem and prez_gop; and remove the day variable.
+* First, clean the data in pols-month.csv. Use separate() to break up the variable mon into integer variables year, month, and day; create a president variable taking values gop and dem, and remove prez_dem and prez_gop; and remove the day variable.
 
+# Cleaning the pols_months data 
 ```{r}
 pols_months = 
   read_csv("data/pols-month.csv") %>% 
   janitor::clean_names() %>% 
-  separate(mon, into = c("year", "month", "day"), sep = "-")
-view(pols_months)
+  separate(mon, into = c("year", "month", "day"), sep = "-") %>%
+  mutate(
+    prez_dem = recode(prez_dem, `1` = "dem", `0` = "gop"),
+    prez_dem = factor(prez_dem)) %>% 
+  rename(president = prez_dem) %>% 
+  select(-prez_gop, -day) 
 ```
 
+  
+Instructions
+* Replace month number with month name
+
+# Replacing month number with month name
+```{r}
+pols_months$month <- str_remove(pols_months$month, "^0+")
+pols_months$month <- as.numeric(pols_months$month)
+```
+
+
+```{r}
+mymonths <- c("Jan","Feb","Mar",
+              "Apr","May","Jun",
+              "Jul","Aug","Sep",
+              "Oct","Nov","Dec")
+
+pols_months$month <- mymonths[ pols_months$month ]
+```
+
+
+Instructions
+* Second, clean the data in snp.csv using a similar process to the above. For consistency across datasets, arrange according to year and month, and organize so that year and month are the leading columns.
+
+```{r}
+snp = 
+  read_csv("data/snp.csv") %>% 
+  janitor::clean_names() %>% 
+  separate(date, into = c("month", "day", "year"), sep = "/") %>% 
+  relocate(year, month, everything()) 
+```
+
+```{r}
+snp$month <- as.numeric(snp$month)
+snp$year = as.numeric(snp$year)
+snp$month <- mymonths[ snp$month ]
+```
+
+```{r}
+ snp %>% 
+  mutate( 
+   year = ifelse(year> 90, year+1900, year+2000))
+```
+error: how to make the year form 2 digits to 4 
+
+Instructions 
+* Third, tidy the unemployment data so that it can be merged with the previous datasets. This process will involve switching from “wide” to “long” format; ensuring that key variables have the same name; and ensuring that key variables take the same values.
+
+```{r}
+unemployment = 
+  read_csv("data/unemployment.csv") %>% 
+  janitor::clean_names() %>% 
+  pivot_longer(
+    jan:dec,
+    names_to = "month",
+    values_to = "close"
+  )
+```
+
+Instructions
+* Join the datasets by merging snp into pols, and merging unemployment into the result.
+```{r}
+snp_pols_combined = 
+  left_join(snp, pols_months, by = "year")
+```
+error: is this a left join? joining by 
+
+Instructiosn
+* Write a short paragraph about these datasets. Explain briefly what each dataset contained, and describe the resulting dataset (e.g. give the dimension, range of years, and names of key variables).
+
+# Problem 3
+
+Instructions
+* Load and tidy the data. Note that, although these data may seem fairly well formatted initially, the names of a categorical predictor and the case structure of string variables changed over time; you’ll need to address this in your data cleaning. Also, some rows seem duplicated, and these will need to be removed (hint: google something like “dplyr remove duplicate rows” to get started).
+
+```{r}
+baby_names = 
+  read_csv("data/Popular_Baby_Names.csv") %>% 
+  janitor::clean_names() %>% 
+  mutate(gender = str_to_lower(gender)) %>% 
+  mutate(ethnicity = str_to_lower(ethnicity)) %>%  
+  mutate(childs_first_name = str_to_lower(childs_first_name)) %>% 
+  distinct() 
+```
+eror: not sure what it means by: "the names of a categorical predictor and the case structure of string variables changed over time"
+
+Instructions:
+* Produce a well-structured, reader-friendly table showing the rank in popularity of the name “Olivia” as a female baby name over time; this should have rows for ethnicities and columns for year. Produce a similar table showing the most popular name among male children over time.
+
+  
+  filter(baby_names, childs_first_name == olivia)
+  knitr::kable()
+
+Instructions:
+* Finally, for male, white non-hispanic children born in 2016, produce a scatter plot showing the number of children with a name (y axis) against the rank in popularity of that name (x axis).
 
 
 
