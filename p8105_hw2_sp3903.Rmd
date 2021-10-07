@@ -1,12 +1,14 @@
 ---
 title: "Homework 2"
-output: html_document
+output:
+  html_document:
+    theme: yeti
+    highlight: haddock
 ---
 
 ```{r}
 library(tidyverse)
 library(readxl)
-library(dplyr)
 library(stringr) 
 ```
 
@@ -20,6 +22,7 @@ trash_wheel = read_excel("data/trash_wheel.xlsx", range = "A2:N406") %>%
   drop_na(dumpster) %>% 
   mutate(sports_balls = round(sports_balls, digits = 0))
 ```
+select("dumpster", "homes_powered")
 
 ## Cleaning precipitation data 2019 
 
@@ -28,8 +31,7 @@ rain_2019 = read_excel("data/trash_wheel.xlsx",
   sheet = "2019 Precipitation", skip = 1)  %>%
   janitor::clean_names() %>% 
   drop_na(month, total) %>% 
-  mutate(
-    year = "2019")
+  mutate(year = "2019")
 ```
 
 ## Cleaning precipitation data 2018
@@ -39,27 +41,18 @@ rain_2018 = read_excel("data/trash_wheel.xlsx",
   sheet = "2018 Precipitation", skip = 1)  %>%
   janitor::clean_names() %>% 
   drop_na(month)  %>% 
-  mutate(
-    year = "2018")
+  mutate(year = "2018")
 ```
+
 
 ## Combining the precipitation data 2019 and 2019
 
 ```{r}
 combined_rain = 
-  bind_rows(rain_2018, rain_2019) 
+  bind_rows(rain_2018, rain_2019) %>% 
+  mutate(month = month.name[as.numeric(month)])
 ```
 
-## Changing month number to name
-
-```{r}
-mymonths <- c("Jan","Feb","Mar",
-              "Apr","May","Jun",
-              "Jul","Aug","Sep",
-              "Oct","Nov","Dec")
-
-combined_rain$month <- mymonths[ combined_rain$month ]
-```
 
 # Description of datasets
 
@@ -69,7 +62,7 @@ combined_rain$month <- mymonths[ combined_rain$month ]
 * The number of observations in the Trash Wheel dataset is `r count(trash_wheel)`.
 * The dataset has `r nrow(trash_wheel)` rows and `r ncol(trash_wheel)` columns.
 * The range of the sports balls is (`r range(trash_wheel$sports_balls)`) mm.
-* The median number of sports balls is (`r median(trash_wheel$sports_balls, year = 2017)`).
+* The median number of sports balls is (`r median(trash_wheel$sports_balls, year = 2019)`).
 
 ## Precipitation Dataset
 
@@ -89,15 +82,12 @@ pols_months =
   separate(mon, into = c("year", "month", "day"), sep = "-") %>%
   mutate(
     prez_dem = recode(prez_dem, `1` = "dem", `0` = "gop"),
-    prez_dem = factor(prez_dem)) %>% 
+    prez_dem = factor(prez_dem),
+    year = as.numeric(year),
+    month = str_remove(month, "^0+"),  
+    month = as.numeric(month)) %>%
   rename(president = prez_dem) %>% 
-  select(-prez_gop, -day) 
-```
-
-```{r}
-pols_months$month <- str_remove(pols_months$month, "^0+")
-pols_months$month <- as.numeric(pols_months$month)
-pols_months$year = as.numeric(pols_months$year)
+  select(-prez_gop, -day)
 ```
 
 ```{r}
@@ -124,6 +114,7 @@ snp =
   separate(date, into = c("month", "day", "year"), sep = "/") %>% 
   relocate(year, month, everything()) 
 ```
+tkae out day 
 
 ```{r}
 snp$month <- as.numeric(snp$month)
@@ -134,7 +125,7 @@ snp$month <- mymonths[ snp$month ]
 ```{r}
  snp = snp %>% 
   mutate( 
-   year = ifelse(year > 21, year+1900, year+2000),
+   year = ifelse(year >= 21, year+1900, year+2000),
    month = str_to_lower(month)) 
 ```
 
@@ -162,6 +153,7 @@ snp_pols_combined =
 final_combined = 
  full_join(snp_pols_combined, unemployment, by = c("year", "month"))
 ```
+look at the joining to see if you did it right 
 
 ## Description of datasets
 
@@ -197,7 +189,7 @@ baby_names =
   mutate(gender = str_to_lower(gender)) %>% 
   mutate(ethnicity = str_to_lower(ethnicity)) %>%  
   mutate(childs_first_name = str_to_lower(childs_first_name)) %>% 
-  distinct() 
+  distinct(year_of_birth, gender, ethnicity, childs_first_name, .keep_all = TRUE) 
 ```
 
 # Olivia Table 
@@ -219,13 +211,11 @@ kyle_popularity =
  filter(baby_names, childs_first_name == "kyle") %>% 
  select(-gender, -count, -childs_first_name)  
 ```
+*need to change to the most popular
 
 ```{r}
 knitr::kable(head(kyle_popularity[, 1:3]), "simple")
 ```
-
-Instructions:
-* Finally, for male, white non-hispanic children born in 2016, produce a scatter plot showing the number of children with a name (y axis) against the rank in popularity of that name (x axis).
 
 # Scatterplot
 
@@ -236,7 +226,7 @@ scatterplot_data =
 
 ```{r}
 ggplot(scatterplot_data, aes(x = rank, y = count)) + 
-    geom_point(aes, alpha = .5)
+    geom_point()
 ```
 
 
