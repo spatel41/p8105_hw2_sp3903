@@ -14,17 +14,17 @@ library(stringr)
 
 # Problem 1
 
-## Cleaning trash_wheel Data
+### Cleaning trash_wheel Data
 
 ```{r}
 trash_wheel = read_excel("data/trash_wheel.xlsx", range = "A2:N406") %>% 
   janitor::clean_names() %>% 
   drop_na(dumpster) %>% 
-  mutate(sports_balls = round(sports_balls, digits = 0))
+  mutate(sports_balls = round(sports_balls, digits = 0)) %>% 
+  select("dumpster", "homes_powered")
 ```
-select("dumpster", "homes_powered")
 
-## Cleaning precipitation data 2019 
+### Cleaning precipitation data 2019 
 
 ```{r}
 rain_2019 = read_excel("data/trash_wheel.xlsx", 
@@ -34,7 +34,7 @@ rain_2019 = read_excel("data/trash_wheel.xlsx",
   mutate(year = "2019")
 ```
 
-## Cleaning precipitation data 2018
+### Cleaning precipitation data 2018
 
 ```{r}
 rain_2018 = read_excel("data/trash_wheel.xlsx", 
@@ -44,8 +44,7 @@ rain_2018 = read_excel("data/trash_wheel.xlsx",
   mutate(year = "2018")
 ```
 
-
-## Combining the precipitation data 2019 and 2019
+### Combining the precipitation datasets
 
 ```{r}
 combined_rain = 
@@ -53,10 +52,9 @@ combined_rain =
   mutate(month = month.name[as.numeric(month)])
 ```
 
+## Description of datasets
 
-# Description of datasets
-
-## Trash Wheel Dataset
+### Trash Wheel Dataset
 
 * The Trash Wheel dataset includes `r length(trash_wheel)` variables: `r variable.names(trash_wheel)`.
 * The number of observations in the Trash Wheel dataset is `r count(trash_wheel)`.
@@ -64,7 +62,7 @@ combined_rain =
 * The range of the sports balls is (`r range(trash_wheel$sports_balls)`) mm.
 * The median number of sports balls is (`r median(trash_wheel$sports_balls, year = 2019)`).
 
-## Precipitation Dataset
+### Precipitation Dataset
 
 * The combined precipitation dataset includes `r length(combined_rain)` variables: `r variable.names(combined_rain)`.
 * The number of observations in the combined precipitation  dataset is `r count(combined_rain)`.
@@ -74,9 +72,10 @@ combined_rain =
 
 # Problem 2
 
-## Pols_months data cleaning 
+### Cleaning Pols_months data
+
 ```{r}
-pols_months = 
+pols_months =  
   read_csv("data/pols-month.csv") %>% 
   janitor::clean_names() %>% 
   separate(mon, into = c("year", "month", "day"), sep = "-") %>%
@@ -85,51 +84,31 @@ pols_months =
     prez_dem = factor(prez_dem),
     year = as.numeric(year),
     month = str_remove(month, "^0+"),  
-    month = as.numeric(month)) %>%
+    month = as.numeric(month)) %>% 
   rename(president = prez_dem) %>% 
-  select(-prez_gop, -day)
+  select(-prez_gop, -day) %>% 
+  mutate(month = month.name[as.numeric(month)]) %>% 
+  mutate(month = str_to_lower(month)) 
 ```
 
-```{r}
-mymonths <- c("Jan","Feb","Mar",
-              "Apr","May","Jun",
-              "Jul","Aug","Sep",
-              "Oct","Nov","Dec")
-
-pols_months$month <- mymonths[ pols_months$month ]
-```
-
-```{r}
-pols_months = pols_months %>% 
-  mutate(
-    month = str_to_lower(month)) 
-```
-
-## Snp Data Cleaning
+### Cleaning Snp data
 
 ```{r}
 snp = 
   read_csv("data/snp.csv") %>% 
   janitor::clean_names() %>% 
   separate(date, into = c("month", "day", "year"), sep = "/") %>% 
-  relocate(year, month, everything()) 
-```
-tkae out day 
-
-```{r}
-snp$month <- as.numeric(snp$month)
-snp$year = as.numeric(snp$year)
-snp$month <- mymonths[ snp$month ]
-```
-
-```{r}
- snp = snp %>% 
+  relocate(year, month, everything()) %>% 
+  select(-day) %>% 
+  mutate(
+    year = as.numeric(year),
+    month = month.name[as.numeric(month)]) %>% 
   mutate( 
    year = ifelse(year >= 21, year+1900, year+2000),
    month = str_to_lower(month)) 
 ```
 
-## Unemployment data cleaning 
+### Cleaning Unemployment data
 
 ```{r}
 unemployment = 
@@ -142,10 +121,7 @@ unemployment =
   )
 ```
 
-Instructions
-* Join the datasets by merging snp into pols, and merging unemployment into the result.
-
-## Join datasets
+### Joining datasets
 
 ```{r}
 snp_pols_combined = 
@@ -153,34 +129,40 @@ snp_pols_combined =
 final_combined = 
  full_join(snp_pols_combined, unemployment, by = c("year", "month"))
 ```
-look at the joining to see if you did it right 
 
-## Description of datasets
+### Description of datasets
 
-### Pols Dataset Description 
+#### Pols Dataset Description 
 
 * The Pols dataset includes `r length(pols_months)` variables: `r variable.names(pols_months)`.
 * The number of observations in the Pols dataset is `r count(pols_months)`.
 * The dataset has `r nrow(pols_months)` rows and `r ncol(pols_months)` columns.
 * The range of the years is (`r range(pols_months$year)`).
 
-### Snp Dataset Description 
+#### Snp Dataset Description 
 
 * The Pols dataset includes `r length(snp)` variables: `r variable.names(snp)`.
 * The number of observations in the Snp dataset is `r count(snp)`.
 * The dataset has `r nrow(snp)` rows and `r ncol(snp)` columns.
 * The range of the years is (`r range(snp$year)`).
 
-### Unemployment Dataset Description 
+#### Unemployment Dataset Description 
 
 * The Pols dataset includes `r length(unemployment)` variables: `r variable.names(unemployment)`.
 * The number of observations in the Unemployment dataset is `r count(unemployment)`.
 * The dataset has `r nrow(unemployment)` rows and `r ncol(unemployment)` columns.
 * The range of the years is (`r range(unemployment$year)`).
 
+#### Combined Dataset Description 
+
+* The combined dataset includes `r length(final_combined)` variables: `r variable.names(final_combined)`.
+* The number of observations in the combined dataset is `r count(final_combined)`.
+* The dataset has `r nrow(final_combined)` rows and `r ncol(final_combined)` columns.
+* The range of the years is (`r range(final_combined$year)`).
+
 # Problem 3
 
-# Baby Names Cleaning 
+## Cleaning baby names dataset
 
 ```{r}
 baby_names = 
@@ -192,7 +174,7 @@ baby_names =
   distinct(year_of_birth, gender, ethnicity, childs_first_name, .keep_all = TRUE) 
 ```
 
-# Olivia Table 
+### Olivia Table 
 
 ```{r}
 olivia_popularity = 
@@ -204,20 +186,19 @@ olivia_popularity =
 knitr::kable(head(olivia_popularity[, 1:3]), "simple")
 ```
 
-## Kyle Table 
+### Jayden Table 
 
 ```{r}
-kyle_popularity = 
- filter(baby_names, childs_first_name == "kyle") %>% 
+jayden_popularity = 
+ filter(baby_names, childs_first_name == "jayden") %>% 
  select(-gender, -count, -childs_first_name)  
 ```
-*need to change to the most popular
-
+ 
 ```{r}
-knitr::kable(head(kyle_popularity[, 1:3]), "simple")
+knitr::kable(head(jayden_popularity[, 1:3]), "simple")
 ```
 
-# Scatterplot
+### Scatterplot
 
 ```{r}
 scatterplot_data =   
