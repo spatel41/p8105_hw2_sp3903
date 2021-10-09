@@ -21,7 +21,7 @@ trash_wheel = read_excel("data/trash_wheel.xlsx", range = "A2:N406") %>%
   janitor::clean_names() %>% 
   drop_na(dumpster) %>% 
   mutate(sports_balls = round(sports_balls, digits = 0)) %>% 
-  select("dumpster", "homes_powered")
+  select("dumpster", "homes_powered", "sports_balls")
 ```
 
 ### Cleaning precipitation data 2019 
@@ -59,7 +59,7 @@ combined_rain =
 * The Trash Wheel dataset includes `r length(trash_wheel)` variables: `r variable.names(trash_wheel)`.
 * The number of observations in the Trash Wheel dataset is `r count(trash_wheel)`.
 * The dataset has `r nrow(trash_wheel)` rows and `r ncol(trash_wheel)` columns.
-* The range of the sports balls is (`r range(trash_wheel$sports_balls)`) mm.
+* The range of the sports balls is (`r range(trash_wheel$sports_balls)`).
 * The median number of sports balls is (`r median(trash_wheel$sports_balls, year = 2019)`).
 
 ### Precipitation Dataset

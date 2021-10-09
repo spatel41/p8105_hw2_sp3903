@@ -467,7 +467,7 @@ pre code {
 <a class="sourceLine" id="cb6-2" data-line-number="2"><span class="st">  </span>janitor<span class="op">::</span><span class="kw">clean_names</span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb6-3" data-line-number="3"><span class="st">  </span><span class="kw">drop_na</span>(dumpster) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb6-4" data-line-number="4"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">sports_balls =</span> <span class="kw">round</span>(sports_balls, <span class="dt">digits =</span> <span class="dv">0</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb6-5" data-line-number="5"><span class="st">  </span><span class="kw">select</span>(<span class="st">&quot;dumpster&quot;</span>, <span class="st">&quot;homes_powered&quot;</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb6-5" data-line-number="5"><span class="st">  </span><span class="kw">select</span>(<span class="st">&quot;dumpster&quot;</span>, <span class="st">&quot;homes_powered&quot;</span>, <span class="st">&quot;sports_balls&quot;</span>)</a></code></pre></div>
 </div>
 <div id="cleaning-precipitation-data-2019" class="section level3">
 <h3>Cleaning precipitation data 2019</h3>
@@ -496,11 +496,11 @@ pre code {
 <div id="trash-wheel-dataset" class="section level3">
 <h3>Trash Wheel Dataset</h3>
 <ul>
-<li>The Trash Wheel dataset includes 2 variables: dumpster, homes_powered.</li>
+<li>The Trash Wheel dataset includes 3 variables: dumpster, homes_powered, sports_balls.</li>
 <li>The number of observations in the Trash Wheel dataset is 344.</li>
-<li>The dataset has 344 rows and 2 columns.</li>
-<li>The range of the sports balls is (, -) mm.</li>
-<li>The median number of sports balls is ().</li>
+<li>The dataset has 344 rows and 3 columns.</li>
+<li>The range of the sports balls is (0, 56).</li>
+<li>The median number of sports balls is (8).</li>
 </ul>
 </div>
 <div id="precipitation-dataset" class="section level3">
